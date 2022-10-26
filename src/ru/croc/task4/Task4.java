@@ -47,9 +47,6 @@ public class Task4 {
         int flag = 0;
         int end = start+1;
         while(s.charAt(end) != '\n'){
-            if(s.charAt(end) == '"'){
-                return s;
-            }
             end++;
             if(end == s.length()){
                 end--;
