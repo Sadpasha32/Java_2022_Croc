@@ -6,7 +6,7 @@ public class LotClass {
     private volatile double currentPrice;
     private volatile String nameOfOwner;
     private final LocalDateTime time;
-    private static int numberOfBets = 0;
+    private static int numberOfBets;
 
     public LotClass(double currentPrice, LocalDateTime time) {
         this.currentPrice = currentPrice;
