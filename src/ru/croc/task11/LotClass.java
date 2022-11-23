@@ -1,30 +1,33 @@
 package ru.croc.task11;
 
-import java.security.Timestamp;
 import java.time.LocalDateTime;
 
-public class LotClass{
-    double currentPrice;
-    private String nameOfOwner;
-    private LocalDateTime time;
+public class LotClass {
+    private volatile double currentPrice;
+    private volatile String nameOfOwner;
+    private final LocalDateTime time;
+    private static int numberOfBets = 0;
 
-    private static final Object lock = new Object();
-
-
-    public LotClass(double currentPrice, String nameOfOwner, LocalDateTime time) {
+    public LotClass(double currentPrice, LocalDateTime time) {
         this.currentPrice = currentPrice;
-        this.nameOfOwner = nameOfOwner;
         this.time = time;
     }
-    public void  bet(int newPrice, String nameOfNewOwnre, LocalDateTime currentTime){
-        synchronized (lock){
-            if (newPrice > currentPrice && currentTime.isBefore(time)){
+
+    public void bet(int newPrice, String nameOfNewOwner, LocalDateTime currentTime) {
+        if(newPrice <= currentPrice){
+            return;
+        }
+        synchronized(this) {
+            if (newPrice > currentPrice && currentTime.isBefore(time)) {
                 currentPrice = newPrice;
-                nameOfOwner = nameOfNewOwnre;
+                nameOfOwner = nameOfNewOwner;
+                numberOfBets++;
             }
         }
     }
-    public String getWinner(){
-        return nameOfOwner;
+
+    public String getWinner() {
+        if(numberOfBets > 0) return nameOfOwner;
+        else return "Пока нет владельца";
     }
 }
