@@ -1,44 +1,39 @@
 package ru.croc.task13;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 
 public class CinemaClass {
     private final HashMap<Integer, String> allFilms = new HashMap<>();
     private final HashMap<Integer, Set<Integer>> allUsersHistory = new HashMap<>();
     private final HashMap<Integer, Integer> filmsFrequency = new HashMap<>();
 
-    public void fillFilms(String filePath) throws IOException {
-        try (BufferedReader r = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            String[] splitLine;
-            while ((line = r.readLine()) != null) {
-                splitLine = line.split(",");
-                if (splitLine.length == 2) allFilms.put(Integer.parseInt(splitLine[0]), splitLine[1]);
-            }
+    public void fillFilms(Scanner sc){
+        System.out.println("Введите фильмы в формате \"номер,название\".\nЗакончите ввод цифрой 0:");
+        String line = sc.nextLine();
+        String[] splitLine;
+        while (!Objects.equals(line, "0")) {
+            splitLine = line.split(",");
+            if (splitLine.length == 2) allFilms.put(Integer.parseInt(splitLine[0]), splitLine[1]);
+            line = sc.nextLine();
         }
     }
 
-    public void fillUsersHistory(String filePath) throws IOException {
-        try (BufferedReader r = new BufferedReader(new FileReader(filePath))) {
-            int i = 0;
-            String line;
-            while ((line = r.readLine()) != null) {
-                allUsersHistory.put(i, new HashSet<>());
-                String[] splitLine = line.split(",");
-                for (String s : splitLine) {
-                    int y = Integer.parseInt(s);
-                    if (filmsFrequency.containsKey(y)) filmsFrequency.put(y, filmsFrequency.get(y) + 1);
-                    else filmsFrequency.put(y, 1);
-                    allUsersHistory.get(i).add(y);
-                }
-                i++;
+    public void fillUsersHistory(Scanner sc){
+        System.out.println("Введите историю просмотров пользователей в формате \"номер фильма,номер фильма,...\".\n Закончите ввод цифрой 0:");
+        String line = sc.nextLine();
+        int i = 0;
+        while (!Objects.equals(line, "0")) {
+            allUsersHistory.put(i, new HashSet<>());
+            String[] splitLine = line.split(",");
+            for (String s : splitLine) {
+                int y = Integer.parseInt(s);
+                if (filmsFrequency.containsKey(y)) filmsFrequency.put(y, filmsFrequency.get(y) + 1);
+                else filmsFrequency.put(y, 1);
+                allUsersHistory.get(i).add(y);
             }
+            i++;
+            line = sc.nextLine();
         }
     }
 
@@ -81,5 +76,9 @@ public class CinemaClass {
 
     public HashMap<Integer, Set<Integer>> getAllUsersHistory() {
         return allUsersHistory;
+    }
+
+    public HashMap<Integer, Integer> getFilmsFrequency() {
+        return filmsFrequency;
     }
 }
