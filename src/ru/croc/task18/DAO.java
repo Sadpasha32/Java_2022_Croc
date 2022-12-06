@@ -1,0 +1,73 @@
+package ru.croc.task18;
+
+import java.sql.*;
+import java.util.List;
+
+public class DAO {
+    Connection con;
+
+    public DAO(Connection con) {
+        this.con = con;
+    }
+
+    Product findProduct(String productCode) {
+        Product resProduct = new Product();
+        try (Statement stmt = con.createStatement()) {
+            ResultSet resultSet = stmt.executeQuery("SELECT nameOfProduct,price FROM Products WHERE art = '" + productCode + "';");
+            if (resultSet.next()) {
+                resProduct.name = resultSet.getString(1);
+                resProduct.cost = resultSet.getInt(2);
+                resProduct.articul = productCode;
+                return resProduct;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Product createProduct(Product product) throws SQLException {
+        if (findProduct(product.articul) == null) {
+            String sqlProduct = "INSERT INTO Products(art,nameOfProduct,price) VALUES(?,?,?);";
+            PreparedStatement stmtProduct = con.prepareStatement(sqlProduct);
+            stmtProduct.setString(1, product.articul);
+            stmtProduct.setString(2, product.name);
+            stmtProduct.setInt(3, product.cost);
+            stmtProduct.executeUpdate();
+            Product.counter++;
+            product.id = Product.counter;
+            return product;
+        } else {
+            throw new RuntimeException();
+        }
+    }
+
+    Product updateProduct(Product product) throws SQLException {
+        String sql = "UPDATE Products SET art ='" + product.articul + "', nameOfProduct ='" + product.name + "', price =" + product.cost +
+                " WHERE idProduct =" + product.id;
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(sql);
+        return product;
+    }
+
+    void deleteProduct(String productCode) throws SQLException {
+        String sql = "DELETE FROM Products WHERE art = " + productCode;
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(sql);
+    }
+
+    Order createOrder(String userLogin, List<Product> products) throws SQLException {
+        String sqlOrder;
+        PreparedStatement stmtOrder;
+        for (Product product : products) {
+            createProduct(product);
+            sqlOrder = "INSERT INTO Orders(idClient,idProduct) VALUES((SELECT idClient FROM Clients WHERE name = ?),(SELECT idProduct FROM PRODUCTS WHERE art = ?));";
+            stmtOrder = con.prepareStatement(sqlOrder);
+            stmtOrder.setString(1, userLogin);
+            stmtOrder.setString(2, product.articul);
+            stmtOrder.executeUpdate();
+        }
+        return new Order(userLogin, products);
+    }
+}
