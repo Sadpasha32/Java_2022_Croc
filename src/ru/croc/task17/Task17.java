@@ -14,7 +14,7 @@ public class Task17 {
         ArrayList<String[]> allData = new ArrayList<>();
         Set<Product> products = new HashSet<>();
         ArrayList<Client> clients = new ArrayList<>();
-        parseDataFromCVS("datacvs.cvs", allData, products, clients);
+        parseDataFromCVS(args[0], allData, products, clients);
         clients.sort((o1, o2) -> (int) (o1.id - o2.id));
         for (Client client1 : clients) {
             addClient(client1, con);
@@ -26,7 +26,7 @@ public class Task17 {
             addOrder(Integer.parseInt(data[0]), data[2], con);
         }
         testRelationships(con);
-
+        con.close();
     }
 
     public static void createTables(Connection con) throws SQLException {
@@ -67,6 +67,7 @@ public class Task17 {
         PreparedStatement stmtClient = con.prepareStatement(sqlClient);
         stmtClient.setString(1, client1.name);
         stmtClient.executeUpdate();
+        stmtClient.close();
     }
 
     public static void addProduct(Product product1, Connection con) throws SQLException {
@@ -78,6 +79,7 @@ public class Task17 {
         stmtProduct.executeUpdate();
         Product.counter++;
         product1.id = Product.counter;
+        stmtProduct.close();
     }
 
     public static void addOrder(int idClient, String articulOfProduct, Connection con) throws SQLException {
@@ -86,6 +88,7 @@ public class Task17 {
         stmtOrder.setInt(1, idClient);
         stmtOrder.setString(2, articulOfProduct);
         stmtOrder.executeUpdate();
+        stmtOrder.close();
     }
 
     public static void testRelationships(Connection con) {

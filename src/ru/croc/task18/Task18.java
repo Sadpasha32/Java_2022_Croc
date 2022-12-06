@@ -39,6 +39,7 @@ public class Task18 {
         System.out.println("\nCheck create order function:");
         dao.createOrder("olga", Arrays.asList(new Product("Т32","TV",30000)));
         testRelationships(con);
+        con.close();
     }
 
     public static void createTables(Connection con) throws SQLException {
@@ -79,6 +80,7 @@ public class Task18 {
         PreparedStatement stmtClient = con.prepareStatement(sqlClient);
         stmtClient.setString(1, client1.name);
         stmtClient.executeUpdate();
+        stmtClient.close();
     }
 
     public static void addOrder(int idClient, String articulOfProduct, Connection con) throws SQLException {
@@ -87,6 +89,7 @@ public class Task18 {
         stmtOrder.setInt(1, idClient);
         stmtOrder.setString(2, articulOfProduct);
         stmtOrder.executeUpdate();
+        stmtOrder.close();
     }
 
     public static void testRelationships(Connection con) {

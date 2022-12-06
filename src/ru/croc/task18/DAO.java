@@ -37,6 +37,7 @@ public class DAO {
             stmtProduct.executeUpdate();
             Product.counter++;
             product.id = Product.counter;
+            stmtProduct.close();
             return product;
         } else {
             throw new RuntimeException();
@@ -48,6 +49,7 @@ public class DAO {
                 " WHERE idProduct =" + product.id;
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
+        stmt.close();
         return product;
     }
 
@@ -55,6 +57,7 @@ public class DAO {
         String sql = "DELETE FROM Products WHERE art = " + productCode;
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
+        stmt.close();
     }
 
     Order createOrder(String userLogin, List<Product> products) throws SQLException {
@@ -67,6 +70,7 @@ public class DAO {
             stmtOrder.setString(1, userLogin);
             stmtOrder.setString(2, product.articul);
             stmtOrder.executeUpdate();
+            stmtOrder.close();
         }
         return new Order(userLogin, products);
     }
