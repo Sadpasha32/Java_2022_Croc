@@ -3,18 +3,10 @@ package ru.croc.task18;
 import java.util.Objects;
 
 public class Product {
-    static public int counter;
-    int id;
     String articul;
     String name;
     int cost;
 
-    public Product(int id, String articul, String name, int cost) {
-        this.id = id;
-        this.articul = articul;
-        this.name = name;
-        this.cost = cost;
-    }
 
     public Product(String articul, String name, int cost) {
         this.articul = articul;

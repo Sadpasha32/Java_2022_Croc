@@ -29,11 +29,11 @@ public class Task18 {
         testRelationships(con);
         System.out.println("\nCheck find function:");
         System.out.println(dao.findProduct("Т1"));
-        Product product = new Product(2, "T228", "Ноутбук", 6800);
+        Product product = new Product("Т2", "Ноутбук", 6800);
         System.out.println("\nCheck update function:");
         dao.updateProduct(product);
         testRelationships(con);
-        dao.deleteProduct("'T228'");
+        dao.deleteProduct("'Т2'");
         System.out.println("\nCheck delete function:");
         testRelationships(con);
         System.out.println("\nCheck create order function:");
@@ -48,11 +48,11 @@ public class Task18 {
             stmt.executeUpdate(sqlQuery);
             sqlQuery = "CREATE TABLE Clients (idClient long PRIMARY KEY AUTO_INCREMENT, name VARCHAR(20));";
             stmt.executeUpdate(sqlQuery);
-            sqlQuery = "CREATE TABLE Products (idProduct long PRIMARY KEY AUTO_INCREMENT, art VARCHAR(20), nameOfProduct VARCHAR(20), price int);";
+            sqlQuery = "CREATE TABLE Products (art VARCHAR(20) PRIMARY KEY, nameOfProduct VARCHAR(20), price int);";
             stmt.executeUpdate(sqlQuery);
-            sqlQuery = "CREATE TABLE Orders (idOrder long PRIMARY KEY AUTO_INCREMENT, idClient long , idProduct long," +
+            sqlQuery = "CREATE TABLE Orders (idOrder long PRIMARY KEY AUTO_INCREMENT, idClient long , artProduct VARCHAR(20)," +
                     " FOREIGN KEY(idClient) REFERENCES Clients(idClient) ON DELETE CASCADE,  " +
-                    "FOREIGN KEY(idProduct) REFERENCES Products(idProduct) ON DELETE CASCADE);";
+                    "FOREIGN KEY(artProduct) REFERENCES Products(art) ON DELETE CASCADE);";
             stmt.executeUpdate(sqlQuery);
             System.out.println("Tables created");
         }
@@ -84,7 +84,7 @@ public class Task18 {
     }
 
     public static void addOrder(int idClient, String articulOfProduct, Connection con) throws SQLException {
-        String sqlOrder = "INSERT INTO Orders(idClient,idProduct) VALUES(?,(SELECT idProduct FROM PRODUCTS WHERE art = ?));";
+        String sqlOrder = "INSERT INTO Orders(idClient,artProduct) VALUES(?,?);";
         PreparedStatement stmtOrder = con.prepareStatement(sqlOrder);
         stmtOrder.setInt(1, idClient);
         stmtOrder.setString(2, articulOfProduct);
@@ -96,7 +96,7 @@ public class Task18 {
         try (Statement statement = con.createStatement()) {
             boolean hasResult = statement.execute("SELECT Clients.idClient,Clients.name,Products.art,Products.nameOfProduct,Products.price"
                     + " FROM Orders JOIN Clients ON Orders.idClient = Clients.idClient"
-                    + " JOIN Products ON Orders.idProduct = Products.idProduct;");
+                    + " JOIN Products ON Orders.artProduct = Products.art;");
             if (hasResult) {
                 try (ResultSet result = statement.getResultSet()) {
                     while (result.next()) {

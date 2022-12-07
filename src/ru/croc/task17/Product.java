@@ -3,8 +3,6 @@ package ru.croc.task17;
 import java.util.Objects;
 
 public class Product {
-    static public int counter;
-    int id;
     String articul;
     String name;
     int cost;

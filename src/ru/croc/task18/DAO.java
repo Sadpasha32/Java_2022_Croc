@@ -35,8 +35,6 @@ public class DAO {
             stmtProduct.setString(2, product.name);
             stmtProduct.setInt(3, product.cost);
             stmtProduct.executeUpdate();
-            Product.counter++;
-            product.id = Product.counter;
             stmtProduct.close();
             return product;
         } else {
@@ -45,8 +43,8 @@ public class DAO {
     }
 
     Product updateProduct(Product product) throws SQLException {
-        String sql = "UPDATE Products SET art ='" + product.articul + "', nameOfProduct ='" + product.name + "', price =" + product.cost +
-                " WHERE idProduct =" + product.id;
+        String sql = "UPDATE Products SET nameOfProduct ='" + product.name + "', price =" + product.cost +
+                " WHERE art = '" + product.articul+"'";
         Statement stmt = con.createStatement();
         stmt.executeUpdate(sql);
         stmt.close();
@@ -65,7 +63,7 @@ public class DAO {
         PreparedStatement stmtOrder;
         for (Product product : products) {
             createProduct(product);
-            sqlOrder = "INSERT INTO Orders(idClient,idProduct) VALUES((SELECT idClient FROM Clients WHERE name = ?),(SELECT idProduct FROM PRODUCTS WHERE art = ?));";
+            sqlOrder = "INSERT INTO Orders(idClient,artProduct) VALUES((SELECT idClient FROM Clients WHERE name = ?),?);";
             stmtOrder = con.prepareStatement(sqlOrder);
             stmtOrder.setString(1, userLogin);
             stmtOrder.setString(2, product.articul);
