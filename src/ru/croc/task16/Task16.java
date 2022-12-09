@@ -20,6 +20,7 @@ public class Task16 {
             ex.printStackTrace();
         }
     }
+
     public static void mergeFiles(List<String> logsFiles) throws IOException {
         int numberOfFiles = logsFiles.size();
         ArrayList<FileInputStream> fileInputStreams = new ArrayList<>();
@@ -31,26 +32,26 @@ public class Task16 {
         for (FileInputStream fileInputStream : fileInputStreams) {
             bufferedReaders.add(new BufferedReader(new InputStreamReader(fileInputStream)));
         }
-        long max_value = Long.MAX_VALUE;
-        String line2 = Long.toString(max_value);
-        int numberOfMinReader = -1, numberOfreaderToRread = -1;
+        long maxValue = Long.MAX_VALUE;
+        String minLine = Long.toString(maxValue);
+        int numberOfMinReader = -1, numberOfreaderToRreadNext = -1;
         for (int i = 0; i < numberOfFiles; i++) {
             lines[i] = bufferedReaders.get(i).readLine();
         }
         while (true) {
             for (int i = 0; i < numberOfFiles; i++) {
-                if(i == numberOfreaderToRread){
+                if (i == numberOfreaderToRreadNext) {
                     lines[i] = bufferedReaders.get(i).readLine();
                 }
-                if (lines[i] != null && Long.parseLong(lines[i].split(" ")[0]) < Long.parseLong(line2.split(" ")[0])) {
-                    line2 = lines[i];
+                if (lines[i] != null && Long.parseLong(lines[i].split(" ")[0]) < Long.parseLong(minLine.split(" ")[0])) {
+                    minLine = lines[i];
                     numberOfMinReader = i;
                 }
             }
-            if (Long.parseLong(line2.split(" ")[0]) != max_value) {
-                System.out.println(line2);
-                line2 = Long.toString(max_value);
-                numberOfreaderToRread = numberOfMinReader;
+            if (Long.parseLong(minLine.split(" ")[0]) != maxValue) {
+                System.out.println(minLine);
+                minLine = Long.toString(maxValue);
+                numberOfreaderToRreadNext = numberOfMinReader;
             } else {
                 break;
             }
