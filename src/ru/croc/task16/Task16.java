@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,70 +15,51 @@ public class Task16 {
             List<String> logFiles = paths.map(Path::toString)
                     .filter(x -> x.toLowerCase().endsWith(".log") || x.toLowerCase().endsWith(".trace"))
                     .collect(Collectors.toList());
-            int numberOfMerges = 0;
-            String newFilePath = logFiles.get(logFiles.size() - 1);
-            while (logFiles.size() != 1) {
-                newFilePath = merge2Files(logFiles.get(0), logFiles.get(1), args[0], numberOfMerges);
-                numberOfMerges++;
-                logFiles.remove(0);
-                logFiles.remove(0);
-                logFiles.add(newFilePath);
-            }
-            FileInputStream fileStream = new FileInputStream(newFilePath);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fileStream));
-            String resLine;
-            while ((resLine = reader.readLine()) != null) {
-                System.out.println(resLine);
-            }
-            fileStream.close();
-            reader.close();
-            Path deletePath;
-            while (numberOfMerges != -1) {
-                deletePath = Paths.get(args[0] + "tempFile" + numberOfMerges + ".txt");
-                Files.deleteIfExists(deletePath);
-                numberOfMerges--;
-            }
+            mergeFiles(logFiles);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-
-    public static String merge2Files(String file1, String file2, String directoryPath, int numberOfMerges) throws IOException {
-        FileInputStream fileStream1 = new FileInputStream(file1);
-        FileInputStream fileStream2 = new FileInputStream(file2);
-        BufferedReader br1 = new BufferedReader(new InputStreamReader(fileStream1));
-        BufferedReader br2 = new BufferedReader(new InputStreamReader(fileStream2));
-        String mergedFile = directoryPath + "tempFile" + numberOfMerges + ".txt";
-        Path mergedFilePath = Paths.get(directoryPath + "tempFile" + numberOfMerges + ".txt");
-        Files.createFile(mergedFilePath);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(mergedFile));
-        String line1 = br1.readLine(), line2 = br2.readLine();
-        while (line1 != null && line2 != null) {
-            if (Integer.parseInt(line1.split(" ")[0]) > Integer.parseInt(line2.split(" ")[0])) {
-                writer.write(line2 + "\n");
-                line2 = br2.readLine();
+    public static void mergeFiles(List<String> logsFiles) throws IOException {
+        int numberOfFiles = logsFiles.size();
+        ArrayList<FileInputStream> fileInputStreams = new ArrayList<>();
+        ArrayList<BufferedReader> bufferedReaders = new ArrayList<>();
+        String[] lines = new String[numberOfFiles];
+        for (String logFile : logsFiles) {
+            fileInputStreams.add(new FileInputStream(logFile));
+        }
+        for (FileInputStream fileInputStream : fileInputStreams) {
+            bufferedReaders.add(new BufferedReader(new InputStreamReader(fileInputStream)));
+        }
+        long max_value = Long.MAX_VALUE;
+        String line2 = Long.toString(max_value);
+        int numberOfMinReader = -1, numberOfreaderToRread = -1;
+        for (int i = 0; i < numberOfFiles; i++) {
+            lines[i] = bufferedReaders.get(i).readLine();
+        }
+        while (true) {
+            for (int i = 0; i < numberOfFiles; i++) {
+                if(i == numberOfreaderToRread){
+                    lines[i] = bufferedReaders.get(i).readLine();
+                }
+                if (lines[i] != null && Long.parseLong(lines[i].split(" ")[0]) < Long.parseLong(line2.split(" ")[0])) {
+                    line2 = lines[i];
+                    numberOfMinReader = i;
+                }
+            }
+            if (Long.parseLong(line2.split(" ")[0]) != max_value) {
+                System.out.println(line2);
+                line2 = Long.toString(max_value);
+                numberOfreaderToRread = numberOfMinReader;
             } else {
-                writer.write(line1 + "\n");
-                line1 = br1.readLine();
+                break;
             }
         }
-        if (line1 != null) {
-            while (line1 != null) {
-                writer.write(line1 + "\n");
-                line1 = br1.readLine();
-            }
+        for (BufferedReader bufferedReader : bufferedReaders) {
+            bufferedReader.close();
         }
-        if (line2 != null) {
-            while (line2 != null) {
-                writer.write(line2 + "\n");
-                line2 = br2.readLine();
-            }
+        for (FileInputStream fileInputStream : fileInputStreams) {
+            fileInputStream.close();
         }
-        writer.close();
-        br1.close();
-        br2.close();
-        fileStream1.close();
-        fileStream2.close();
-        return mergedFile;
     }
 }
